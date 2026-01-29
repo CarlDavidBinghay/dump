@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsureSafe Agency Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f9fafb;
+        }
+        
+        .sidebar-active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .sidebar-active i {
+            color: var(--primary-dark);
+        }
+        
+        .avatar-bg-1 { background: linear-gradient(135deg, #fef3c7, #fbbf24); color: #92400e; }
+        .avatar-bg-2 { background: linear-gradient(135deg, #d1fae5, #10b981); color: #064e3b; }
+        .avatar-bg-3 { background: linear-gradient(135deg, #e0e7ff, #6366f1); color: #3730a3; }
+        .avatar-bg-4 { background: linear-gradient(135deg, #fce7f3, #ec4899); color: #831843; }
+        .avatar-bg-5 { background: linear-gradient(135deg, #fef3c7, #f59e0b); color: #92400e; }
+        
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #34d399);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary-light);
+        }
+        
+        .team-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), #34d399);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary-light);
+        }
+        
+        .team-card:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, var(--primary-dark), #047857);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-dark);
+            border: 1px solid var(--primary-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+        
+        .sidebar {
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                backdrop-filter: blur(2px);
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #e5e7eb;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #34d399);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            border: 2px solid white;
+        }
+        
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-light), white);
+            border: 1px solid #d1fae5;
+            color: var(--primary-dark);
+        }
+        
+        .message-popup {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e5e7eb;
+            padding: 16px;
+            max-width: 320px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+        
+        .message-popup.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        
+        .settings-section {
+            display: none;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .settings-nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .settings-nav-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .settings-nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .activity-log-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid;
+            margin-bottom: 8px;
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .activity-log-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile Overlay -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+    
+    <!-- Message Popup -->
+    <div id="messagePopup" class="message-popup">
+        <div class="flex items-start">
+            <div class="icon-circle mr-3">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="flex-1">
+                <h4 class="font-bold text-gray-900" id="popupTitle">Success!</h4>
+                <p class="text-gray-600 text-sm mt-1" id="popupMessage">Action completed successfully.</p>
+            </div>
+            <button onclick="hidePopup()" class="ml-2 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Add Team Member Modal -->
+    <div id="addMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Add New Team Member</h3>
+                <button onclick="closeModal('addMemberModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="addMemberForm" onsubmit="addNewMember(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" id="memberName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Enter full name" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" id="memberEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Enter email address" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                        <select id="memberRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+                            <option value="Agent">Agent</option>
+                            <option value="Senior Agent">Senior Agent</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Administrator">Administrator</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Join Date</label>
+                        <input type="date" id="memberJoinDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" onclick="closeModal('addMemberModal')" class="px-5 py-2.5 btn-secondary rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 btn-primary rounded-lg">
+                        <i class="fas fa-user-plus mr-2"></i> Add Member
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Filter Modal -->
+    <div id="filterModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Filter Team Members</h3>
+                <button onclick="closeModal('filterModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-3">Role</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2" checked>
+                            <span>Agent</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2" checked>
+                            <span>Senior Agent</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2" checked>
+                            <span>Manager</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2" checked>
+                            <span>Administrator</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-3">Join Date</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="joinDate" class="border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2" checked>
+                            <span>Last 30 days</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="joinDate" class="border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2">
+                            <span>Last 3 months</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="joinDate" class="border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2">
+                            <span>Last 6 months</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="joinDate" class="border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2">
+                            <span>All time</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-3">Sort By</h4>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option>Newest First</option>
+                        <option>Oldest First</option>
+                        <option>Name (A-Z)</option>
+                        <option>Name (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-8">
+                <button onclick="closeModal('filterModal')" class="px-5 py-2.5 btn-secondary rounded-lg">
+                    Reset
+                </button>
+                <button onclick="applyFilter()" class="px-5 py-2.5 btn-primary rounded-lg">
+                    <i class="fas fa-filter mr-2"></i> Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Layout -->
+    <div class="flex min-h-screen">
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-toggle" class="md:hidden fixed top-6 left-6 z-30 bg-white p-3 rounded-xl shadow-lg border border-gray-200 btn-primary">
+            <i class="fas fa-bars text-white"></i>
+        </button>
+        
+        <!-- Sidebar -->
+        <div class="sidebar w-72 bg-white border-r border-gray-200 flex-shrink-0 md:static h-full z-20">
+            <div class="p-6 flex flex-col h-full">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3 mb-10">
+                    <div class="icon-circle">
+                        <i class="fas fa-shield-alt text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">InsureSafe</h1>
+                        <p class="text-xs text-gray-500 font-medium">INSURANCE AGENCY</p>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div class="mb-10">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Settings</h2>
+                    <p class="text-gray-700 text-sm">Manage your account and preferences</p>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex-1">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-6">Sidebar</h3>
+                    
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" onclick="setActiveNav(this, 'dashboard')" class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all sidebar-active">
+                                <i class="fas fa-chart-pie mr-3 text-gray-500 text-lg"></i>
+                                <span class="font-medium">Dashboard</span>
+                            </a>
+                        </li>
+                        
+                        <li class="mt-8">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider px-4 mb-3">Sales</p>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'deals')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-project-diagram mr-3 text-gray-400"></i>
+                                        <span>Deals Pipeline</span>
+                                        <span class="ml-auto bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded-full">24</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'schedule')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-calendar-check mr-3 text-gray-400"></i>
+                                        <span>My Schedule</span>
+                                        <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">5</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'leads')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-bullseye mr-3 text-gray-400"></i>
+                                        <span>Leads</span>
+                                        <span class="ml-auto bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full">12</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <li class="mt-8">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider px-4 mb-3">Clients</p>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'clients')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-users mr-3 text-gray-400"></i>
+                                        <span>All Clients</span>
+                                        <span class="ml-auto bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded-full">892</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'policies')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-file-contract mr-3 text-gray-400"></i>
+                                        <span>Policies & Renewals</span>
+                                        <span class="ml-auto bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded-full">47</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'commissions')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-hand-holding-usd mr-3 text-gray-400"></i>
+                                        <span>Commissions</span>
+                                        <span class="ml-auto bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-full">$42.5K</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <li class="mt-8">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider px-4 mb-3">Communication</p>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'messages')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-comment-dots mr-3 text-gray-400"></i>
+                                        <span>Messages</span>
+                                        <span class="ml-auto bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded-full">5</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'chat')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-comments mr-3 text-gray-400"></i>
+                                        <span>Team Chat</span>
+                                        <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">3</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <li class="mt-8">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider px-4 mb-3">Resources</p>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'documents')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-folder-open mr-3 text-gray-400"></i>
+                                        <span>Documents</span>
+                                        <span class="ml-auto bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full">247</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="setActiveNav(this, 'reports')" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                        <i class="fas fa-chart-line mr-3 text-gray-400"></i>
+                                        <span>Reports</span>
+                                        <span class="ml-auto bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-full">15</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <!-- Settings Menu Item -->
+                        <li class="mt-8">
+                            <a href="#" onclick="openSettings()" class="flex items-center px-4 py-3 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all">
+                                <i class="fas fa-cog mr-3 text-gray-400"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- User Profile -->
+                <div class="pt-6 border-t border-gray-200">
+                    <div class="flex items-center p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold">
+                            AJ
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="font-semibold text-gray-900">Admin User</p>
+                            <p class="text-xs text-gray-500">Administrator</p>
+                        </div>
+                        <button onclick="showProfileMenu()" class="p-2 rounded-lg hover:bg-white">
+                            <i class="fas fa-chevron-down text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 px-8 py-6">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+                    <div class="mb-4 md:mb-0">
+                        <h1 class="text-2xl font-bold text-gray-900" id="pageTitle">Dashboard Overview</h1>
+                        <p class="text-gray-600" id="pageDescription">Welcome back, Admin. Here's your agency performance summary.</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Search Bar -->
+                        <div class="relative hidden md:block">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" id="searchInput" class="search-bar pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-64" placeholder="Search clients, policies...">
+                        </div>
+                        
+                        <!-- Notifications -->
+                        <button onclick="showNotifications()" class="relative p-2.5 rounded-xl hover:bg-gray-100">
+                            <i class="fas fa-bell text-gray-600 text-lg"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                        
+                        <!-- Messages -->
+                        <button onclick="showMessages()" class="relative p-2.5 rounded-xl hover:bg-gray-100">
+                            <i class="fas fa-envelope text-gray-600 text-lg"></i>
+                            <span class="notification-dot bg-blue-500"></span>
+                        </button>
+                        
+                        <!-- Add New Button -->
+                        <button onclick="showNewOptions()" class="px-4 py-2.5 btn-primary rounded-xl font-medium flex items-center">
+                            <i class="fas fa-plus mr-2"></i> New
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-8" id="mainContent">
+                <!-- Dashboard Content (Default) -->
+                <div id="dashboardContent" class="settings-section active">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                        <div class="stat-card bg-white rounded-2xl p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Total Policies</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">1,247</p>
+                                    <div class="flex items-center mt-3">
+                                        <span class="text-emerald-500 text-sm font-medium flex items-center bg-emerald-50 px-2 py-1 rounded-full">
+                                            <i class="fas fa-arrow-up mr-1 text-xs"></i> 12% growth
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="icon-circle">
+                                    <i class="fas fa-file-contract text-xl"></i>
+                                </div>
+                            </div>
+                            <button onclick="viewPolicies()" class="w-full mt-6 py-2.5 text-emerald-600 hover:text-emerald-700 font-medium rounded-lg hover:bg-emerald-50">
+                                View Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-2xl p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Active Clients</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">892</p>
+                                    <div class="flex items-center mt-3">
+                                        <span class="text-emerald-500 text-sm font-medium flex items-center bg-emerald-50 px-2 py-1 rounded-full">
+                                            <i class="fas fa-arrow-up mr-1 text-xs"></i> 8% growth
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="icon-circle">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                            </div>
+                            <button onclick="viewClients()" class="w-full mt-6 py-2.5 text-emerald-600 hover:text-emerald-700 font-medium rounded-lg hover:bg-emerald-50">
+                                View Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-2xl p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Renewals Due</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">47</p>
+                                    <div class="flex items-center mt-3">
+                                        <span class="text-amber-500 text-sm font-medium flex items-center bg-amber-50 px-2 py-1 rounded-full">
+                                            <i class="fas fa-exclamation-circle mr-1 text-xs"></i> 12 this week
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="icon-circle bg-amber-50 text-amber-600 border-amber-100">
+                                    <i class="fas fa-clock text-xl"></i>
+                                </div>
+                            </div>
+                            <button onclick="viewRenewals()" class="w-full mt-6 py-2.5 text-amber-600 hover:text-amber-700 font-medium rounded-lg hover:bg-amber-50">
+                                View Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-2xl p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Monthly Commissions</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">$42,580</p>
+                                    <div class="flex items-center mt-3">
+                                        <span class="text-emerald-500 text-sm font-medium flex items-center bg-emerald-50 px-2 py-1 rounded-full">
+                                            <i class="fas fa-arrow-up mr-1 text-xs"></i> 15% growth
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="icon-circle bg-purple-50 text-purple-600 border-purple-100">
+                                    <i class="fas fa-money-check-alt text-xl"></i>
+                                </div>
+                            </div>
+                            <button onclick="viewCommissions()" class="w-full mt-6 py-2.5 text-purple-600 hover:text-purple-700 font-medium rounded-lg hover:bg-purple-50">
+                                View Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Members Section -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-10">
+                        <div class="px-8 py-6 border-b border-gray-200">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-900">Team Members</h2>
+                                    <p class="text-gray-600 mt-1">22 members in your agency</p>
+                                </div>
+                                <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                                    <button onclick="openModal('filterModal')" class="px-5 py-2.5 btn-secondary rounded-xl font-medium flex items-center">
+                                        <i class="fas fa-filter mr-2"></i> Filter
+                                    </button>
+                                    <button onclick="openModal('addMemberModal')" class="px-5 py-2.5 btn-primary rounded-xl font-medium flex items-center">
+                                        <i class="fas fa-user-plus mr-2"></i> Add Member
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                                <!-- Team Member 1 -->
+                                <div class="team-card rounded-xl p-6 bg-white">
+                                    <div class="flex flex-col items-center text-center">
+                                        <div class="w-20 h-20 avatar-bg-1 rounded-full flex items-center justify-center font-bold text-2xl mb-4 shadow-md">
+                                            KS
+                                        </div>
+                                        <h3 class="font-bold text-gray-900 text-lg">Keundta Smith</h3>
+                                        <p class="text-gray-500 text-sm mt-1">Joined Jan 8, 2026</p>
+                                        <div class="mt-4 w-full">
+                                            <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Agent</span>
+                                        </div>
+                                        <div class="flex space-x-3 mt-6">
+                                            <button onclick="sendMessage('Keundta Smith')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Send Message">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button onclick="callMember('Keundta Smith')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Call">
+                                                <i class="fas fa-phone"></i>
+                                            </button>
+                                            <button onclick="viewProfile('Keundta Smith')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Team Member 2 -->
+                                <div class="team-card rounded-xl p-6 bg-white">
+                                    <div class="flex flex-col items-center text-center">
+                                        <div class="w-20 h-20 avatar-bg-2 rounded-full flex items-center justify-center font-bold text-2xl mb-4 shadow-md">
+                                            DM
+                                        </div>
+                                        <h3 class="font-bold text-gray-900 text-lg">DM</h3>
+                                        <p class="text-gray-500 text-sm mt-1">Joined Jan 5, 2026</p>
+                                        <div class="mt-4 w-full">
+                                            <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Agent</span>
+                                        </div>
+                                        <div class="flex space-x-3 mt-6">
+                                            <button onclick="sendMessage('DM')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Send Message">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button onclick="callMember('DM')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Call">
+                                                <i class="fas fa-phone"></i>
+                                            </button>
+                                            <button onclick="viewProfile('DM')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Team Member 3 -->
+                                <div class="team-card rounded-xl p-6 bg-white">
+                                    <div class="flex flex-col items-center text-center">
+                                        <div class="w-20 h-20 avatar-bg-3 rounded-full flex items-center justify-center font-bold text-2xl mb-4 shadow-md">
+                                            DF
+                                        </div>
+                                        <h3 class="font-bold text-gray-900 text-lg">DEFIN</h3>
+                                        <p class="text-gray-500 text-sm mt-1">Joined Jan 4, 2026</p>
+                                        <div class="mt-4 w-full">
+                                            <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Agent</span>
+                                        </div>
+                                        <div class="flex space-x-3 mt-6">
+                                            <button onclick="sendMessage('DEFIN')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Send Message">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button onclick="callMember('DEFIN')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Call">
+                                                <i class="fas fa-phone"></i>
+                                            </button>
+                                            <button onclick="viewProfile('DEFIN')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Team Member 4 -->
+                                <div class="team-card rounded-xl p-6 bg-white">
+                                    <div class="flex flex-col items-center text-center">
+                                        <div class="w-20 h-20 avatar-bg-4 rounded-full flex items-center justify-center font-bold text-2xl mb-4 shadow-md">
+                                            TT
+                                        </div>
+                                        <h3 class="font-bold text-gray-900 text-lg">Tac</h3>
+                                        <p class="text-gray-500 text-sm mt-1">Joined Dec 30, 2025</p>
+                                        <div class="mt-4 w-full">
+                                            <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Agent</span>
+                                        </div>
+                                        <div class="flex space-x-3 mt-6">
+                                            <button onclick="sendMessage('Tac')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Send Message">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button onclick="callMember('Tac')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Call">
+                                                <i class="fas fa-phone"></i>
+                                            </button>
+                                            <button onclick="viewProfile('Tac')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Team Member 5 -->
+                                <div class="team-card rounded-xl p-6 bg-white">
+                                    <div class="flex flex-col items-center text-center">
+                                        <div class="w-20 h-20 avatar-bg-5 rounded-full flex items-center justify-center font-bold text-2xl mb-4 shadow-md">
+                                            AC
+                                        </div>
+                                        <h3 class="font-bold text-gray-900 text-lg">Amand</h3>
+                                        <p class="text-gray-500 text-sm mt-1">Joined Dec 29, 2025</p>
+                                        <div class="mt-4 w-full">
+                                            <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Agent</span>
+                                        </div>
+                                        <div class="flex space-x-3 mt-6">
+                                            <button onclick="sendMessage('Amand')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Send Message">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button onclick="callMember('Amand')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="Call">
+                                                <i class="fas fa-phone"></i>
+                                            </button>
+                                            <button onclick="viewProfile('Amand')" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-emerald-100 hover:text-emerald-600 transition-colors" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- View All Button -->
+                            <div class="mt-10 pt-8 border-t border-gray-200 text-center">
+                                <button onclick="viewAllMembers()" class="px-6 py-3 btn-secondary rounded-xl font-medium inline-flex items-center text-lg">
+                                    <span>View All 22 Team Members</span>
+                                    <i class="fas fa-arrow-right ml-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Section: Recent Activity & Performance -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Recent Activity -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="text-xl font-bold text-gray-900">Recent Activity</h3>
+                                <button onclick="viewAllActivity()" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
+                                    View All <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                                    <div class="icon-circle mr-4 bg-emerald-50 text-emerald-600 border-emerald-100">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-900">New client onboarded</p>
+                                        <p class="text-gray-600 text-sm mt-1">Robert Chen signed a new auto insurance policy</p>
+                                        <p class="text-gray-400 text-xs mt-2">2 hours ago</p>
+                                    </div>
+                                    <button onclick="viewActivityDetails('client-onboarded')" class="ml-4 text-gray-400 hover:text-emerald-600">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                                    <div class="icon-circle mr-4 bg-blue-50 text-blue-600 border-blue-100">
+                                        <i class="fas fa-file-signature"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-900">Policy renewed</p>
+                                        <p class="text-gray-600 text-sm mt-1">Jennifer Lopez renewed her home insurance policy</p>
+                                        <p class="text-gray-400 text-xs mt-2">5 hours ago</p>
+                                    </div>
+                                    <button onclick="viewActivityDetails('policy-renewed')" class="ml-4 text-gray-400 hover:text-emerald-600">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                                    <div class="icon-circle mr-4 bg-purple-50 text-purple-600 border-purple-100">
+                                        <i class="fas fa-comment-dollar"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-900">Commission paid</p>
+                                        <p class="text-gray-600 text-sm mt-1">Commission for Q1 2026 has been processed</p>
+                                        <p class="text-gray-400 text-xs mt-2">Yesterday</p>
+                                    </div>
+                                    <button onclick="viewActivityDetails('commission-paid')" class="ml-4 text-gray-400 hover:text-emerald-600">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                                    <div class="icon-circle mr-4 bg-amber-50 text-amber-600 border-amber-100">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-900">Renewal reminder</p>
+                                        <p class="text-gray-600 text-sm mt-1">15 policies are up for renewal in the next 7 days</p>
+                                        <p class="text-gray-400 text-xs mt-2">2 days ago</p>
+                                    </div>
+                                    <button onclick="viewActivityDetails('renewal-reminder')" class="ml-4 text-gray-400 hover:text-emerald-600">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Performance Metrics -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="text-xl font-bold text-gray-900">Performance Metrics</h3>
+                                <select onchange="changeMetricPeriod(this)" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                    <option>This Month</option>
+                                    <option>Last Month</option>
+                                    <option>This Quarter</option>
+                                    <option>This Year</option>
+                                </select>
+                            </div>
+                            
+                            <div class="space-y-7">
+                                <div>
+                                    <div class="flex justify-between mb-3">
+                                        <span class="text-gray-700 font-medium">Deals Pipeline</span>
+                                        <span class="font-bold text-gray-900">78%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-3">
+                                        <span class="text-gray-700 font-medium">Monthly Target</span>
+                                        <span class="font-bold text-gray-900">92%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-3">
+                                        <span class="text-gray-700 font-medium">Client Satisfaction</span>
+                                        <span class="font-bold text-gray-900">94%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: 94%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-3">
+                                        <span class="text-gray-700 font-medium">Team Performance</span>
+                                        <span class="font-bold text-gray-900">86%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: 86%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="mt-10 pt-8 border-t border-gray-200">
+                                <h4 class="font-medium text-gray-700 mb-4">Quick Stats</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button onclick="viewNewPolicies()" class="bg-emerald-50 p-5 rounded-xl hover:bg-emerald-100 transition-colors text-left">
+                                        <p class="text-sm text-gray-600">New Policies</p>
+                                        <p class="text-2xl font-bold text-gray-900 mt-1">24</p>
+                                    </button>
+                                    <button onclick="viewMeetings()" class="bg-blue-50 p-5 rounded-xl hover:bg-blue-100 transition-colors text-left">
+                                        <p class="text-sm text-gray-600">Meetings</p>
+                                        <p class="text-2xl font-bold text-gray-900 mt-1">12</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Content -->
+                <div id="settingsContent" class="settings-section">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900">Settings</h2>
+                        <p class="text-gray-600 mt-2">Manage your account and agency preferences</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        <!-- Settings Navigation -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                                <h3 class="font-bold text-gray-900 mb-4">Settings Menu</h3>
+                                
+                                <div class="space-y-1">
+                                    <div class="settings-nav-item active" onclick="openSettingsTab('profile')">
+                                        <i class="fas fa-user-circle mr-3 text-emerald-600"></i>
+                                        <span>Profile</span>
+                                    </div>
+                                    
+                                    <div class="settings-nav-item" onclick="openSettingsTab('notifications')">
+                                        <i class="fas fa-bell mr-3 text-gray-500"></i>
+                                        <span>Notifications</span>
+                                    </div>
+                                    
+                                    <div class="settings-nav-item" onclick="openSettingsTab('security')">
+                                        <i class="fas fa-shield-alt mr-3 text-gray-500"></i>
+                                        <span>Security</span>
+                                    </div>
+                                    
+                                    <div class="settings-nav-item" onclick="openSettingsTab('company')">
+                                        <i class="fas fa-building mr-3 text-gray-500"></i>
+                                        <span>Company</span>
+                                    </div>
+                                    
+                                    <div class="mt-8 pt-6 border-t border-gray-200">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Admin</h4>
+                                        
+                                        <div class="settings-nav-item" onclick="openSettingsTab('team')">
+                                            <i class="fas fa-users mr-3 text-gray-500"></i>
+                                            <span>Team Member</span>
+                                        </div>
+                                        
+                                        <div class="settings-nav-item" onclick="openSettingsTab('agency')">
+                                            <i class="fas fa-chart-line mr-3 text-gray-500"></i>
+                                            <span>Agency</span>
+                                        </div>
+                                        
+                                        <div class="settings-nav-item" onclick="openSettingsTab('activity')">
+                                            <i class="fas fa-history mr-3 text-gray-500"></i>
+                                            <span>Activity Monitor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Settings Content Area -->
+                        <div class="lg:col-span-3">
+                            <!-- Profile Tab -->
+                            <div id="profileTab" class="tab-content active">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Profile Settings</h3>
+                                    
+                                    <div class="flex flex-col md:flex-row md:items-center mb-8">
+                                        <div class="w-24 h-24 bg-emerald-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 md:mb-0 md:mr-6">
+                                            AJ
+                                        </div>
+                                        <div>
+                                            <h4 class="text-lg font-bold text-gray-900">Admin User</h4>
+                                            <p class="text-gray-600">Administrator</p>
+                                            <p class="text-sm text-gray-500 mt-2">Last login: Today at 9:42 AM</p>
+                                            <button class="mt-4 px-4 py-2 btn-secondary rounded-lg">
+                                                <i class="fas fa-camera mr-2"></i> Change Avatar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <form class="space-y-6">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="Admin" placeholder="First Name">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="User" placeholder="Last Name">
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                            <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="admin@insuresafe.com" placeholder="Email Address">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                            <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="+1 (555) 123-4567" placeholder="Phone Number">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Agent</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                                            <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" rows="4" placeholder="Tell us about yourself...">System administrator with full access to all agency functions and settings.</textarea>
+                                        </div>
+                                        
+                                        <div class="flex justify-end">
+                                            <button type="button" class="px-6 py-3 btn-primary rounded-lg">
+                                                <i class="fas fa-save mr-2"></i> Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Notifications Tab -->
+                            <div id="notificationsTab" class="tab-content">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Notification Preferences</h3>
+                                    
+                                    <div class="space-y-6">
+                                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                            <div>
+                                                <h4 class="font-medium text-gray-900">Email Notifications</h4>
+                                                <p class="text-sm text-gray-600">Receive notifications via email</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" class="sr-only peer" checked>
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                            <div>
+                                                <h4 class="font-medium text-gray-900">Push Notifications</h4>
+                                                <p class="text-sm text-gray-600">Receive push notifications in browser</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" class="sr-only peer" checked>
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                            <div>
+                                                <h4 class="font-medium text-gray-900">SMS Notifications</h4>
+                                                <p class="text-sm text-gray-600">Receive notifications via SMS</p>
+                                            </div>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" class="sr-only peer">
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="mt-8">
+                                            <h4 class="font-medium text-gray-900 mb-4">Notification Types</h4>
+                                            <div class="space-y-4">
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-3" checked>
+                                                    <span>New client signups</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-3" checked>
+                                                    <span>Policy renewals</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-3">
+                                                    <span>Commission payments</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-3" checked>
+                                                    <span>Team member activity</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-3" checked>
+                                                    <span>System alerts</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-end mt-8">
+                                            <button type="button" class="px-6 py-3 btn-primary rounded-lg">
+                                                <i class="fas fa-save mr-2"></i> Save Preferences
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Security Tab -->
+                            <div id="securityTab" class="tab-content">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Security Settings</h3>
+                                    
+                                    <div class="space-y-8">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900 mb-4">Change Password</h4>
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                                                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Enter current password">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                                                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Enter new password">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                                                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Confirm new password">
+                                                </div>
+                                            </div>
+                                            <button class="mt-4 px-4 py-2 btn-primary rounded-lg">
+                                                Update Password
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="pt-6 border-t border-gray-200">
+                                            <h4 class="font-medium text-gray-900 mb-4">Two-Factor Authentication</h4>
+                                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-900">Enable 2FA</h4>
+                                                    <p class="text-sm text-gray-600">Add an extra layer of security to your account</p>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" class="sr-only peer">
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="pt-6 border-t border-gray-200">
+                                            <h4 class="font-medium text-gray-900 mb-4">Active Sessions</h4>
+                                            <div class="space-y-4">
+                                                <div class="flex items-center justify-between p-4 border border-emerald-100 bg-emerald-50 rounded-lg">
+                                                    <div>
+                                                        <h4 class="font-medium text-gray-900">Current Session</h4>
+                                                        <p class="text-sm text-gray-600">Chrome on Windows • Just now</p>
+                                                        <p class="text-xs text-gray-500">IP: 192.168.1.1 • Location: New York, USA</p>
+                                                    </div>
+                                                    <span class="admin-badge">Current</span>
+                                                </div>
+                                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                                    <div>
+                                                        <h4 class="font-medium text-gray-900">Mobile Session</h4>
+                                                        <p class="text-sm text-gray-600">Safari on iPhone • 2 hours ago</p>
+                                                        <p class="text-xs text-gray-500">IP: 192.168.1.2 • Location: New York, USA</p>
+                                                    </div>
+                                                    <button class="text-red-600 hover:text-red-800 text-sm">
+                                                        <i class="fas fa-sign-out-alt mr-1"></i> Revoke
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Company Tab -->
+                            <div id="companyTab" class="tab-content">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Company Information</h3>
+                                    
+                                    <div class="space-y-6">
+                                        <div class="flex items-center mb-8">
+                                            <div class="icon-circle mr-4">
+                                                <i class="fas fa-building text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-lg font-bold text-gray-900">InsureSafe Agency</h4>
+                                                <p class="text-gray-600">Insurance Provider • Founded 2018</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <form class="space-y-6">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="InsureSafe Agency" placeholder="Company Name">
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Address</label>
+                                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="123 Insurance Ave, Suite 500" placeholder="Address Line 1">
+                                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 mt-3" value="New York, NY 10001" placeholder="Address Line 2">
+                                            </div>
+                                            
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                                    <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="+1 (555) 123-4567" placeholder="Phone Number">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" value="contact@insuresafe.com" placeholder="Email Address">
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Description</label>
+                                                <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" rows="4">InsureSafe Agency is a leading provider of comprehensive insurance solutions for individuals and businesses. With over 8 years of experience, we specialize in auto, home, life, and business insurance policies, committed to delivering exceptional customer service and tailored coverage options.</textarea>
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Hours</label>
+                                                <div class="grid grid-cols-2 gap-4">
+                                                    <div class="p-3 border border-gray-200 rounded-lg">
+                                                        <p class="text-sm text-gray-600">Monday - Friday</p>
+                                                        <p class="font-medium">9:00 AM - 6:00 PM</p>
+                                                    </div>
+                                                    <div class="p-3 border border-gray-200 rounded-lg">
+                                                        <p class="text-sm text-gray-600">Saturday</p>
+                                                        <p class="font-medium">10:00 AM - 4:00 PM</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex justify-end">
+                                                <button type="button" class="px-6 py-3 btn-primary rounded-lg">
+                                                    <i class="fas fa-save mr-2"></i> Save Company Info
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Team Tab -->
+                            <div id="teamTab" class="tab-content">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Team Management</h3>
+                                    
+                                    <div class="mb-8">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h4 class="font-medium text-gray-900">Team Members</h4>
+                                            <button class="px-4 py-2 btn-primary rounded-lg">
+                                                <i class="fas fa-user-plus mr-2"></i> Invite Member
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full">
+                                                <thead>
+                                                    <tr class="border-b border-gray-200">
+                                                        <th class="text-left py-3 text-sm font-medium text-gray-700">Member</th>
+                                                        <th class="text-left py-3 text-sm font-medium text-gray-700">Role</th>
+                                                        <th class="text-left py-3 text-sm font-medium text-gray-700">Join Date</th>
+                                                        <th class="text-left py-3 text-sm font-medium text-gray-700">Status</th>
+                                                        <th class="text-left py-3 text-sm font-medium text-gray-700">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="border-b border-gray-100">
+                                                        <td class="py-4">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                                                    AJ
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-medium">Admin User</p>
+                                                                    <p class="text-sm text-gray-500">admin@insuresafe.com</p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="py-4">
+                                                            <span class="admin-badge">Administrator</span>
+                                                        </td>
+                                                        <td class="py-4 text-gray-700">Jan 1, 2024</td>
+                                                        <td class="py-4">
+                                                            <span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+                                                        </td>
+                                                        <td class="py-4">
+                                                            <button class="text-emerald-600 hover:text-emerald-800">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-b border-gray-100">
+                                                        <td class="py-4">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-sm mr-3">
+                                                                    LR
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-medium">Lisa Roberts</p>
+                                                                    <p class="text-sm text-gray-500">lisa@insuresafe.com</p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="py-4">
+                                                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Manager</span>
+                                                        </td>
+                                                        <td class="py-4 text-gray-700">Mar 15, 2025</td>
+                                                        <td class="py-4">
+                                                            <span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+                                                        </td>
+                                                        <td class="py-4">
+                                                            <button class="text-emerald-600 hover:text-emerald-800">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-b border-gray-100">
+                                                        <td class="py-4">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm mr-3">
+                                                                    MJ
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-medium">Michael Jordan</p>
+                                                                    <p class="text-sm text-gray-500">michael@insuresafe.com</p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="py-4">
+                                                            <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">Senior Agent</span>
+                                                        </td>
+                                                        <td class="py-4 text-gray-700">Jun 20, 2025</td>
+                                                        <td class="py-4">
+                                                            <span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+                                                        </td>
+                                                        <td class="py-4">
+                                                            <button class="text-emerald-600 hover:text-emerald-800">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pt-6 border-t border-gray-200">
+                                        <h4 class="font-medium text-gray-900 mb-4">Team Permissions</h4>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-900">Allow Team Invitations</h4>
+                                                    <p class="text-sm text-gray-600">Let managers invite new team members</p>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" class="sr-only peer" checked>
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                                <div>
+                                                    <h4 class="font-medium text-gray-900">View Commission Reports</h4>
+                                                    <p class="text-sm text-gray-600">Allow agents to view commission reports</p>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" class="sr-only peer">
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Agency Tab -->
+                            <div id="agencyTab" class="tab-content">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Agency Settings</h3>
+                                    
+                                    <div class="space-y-8">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900 mb-4">Commission Structure</h4>
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <div class="p-4 border border-gray-200 rounded-lg">
+                                                    <p class="text-sm text-gray-600">Agents</p>
+                                                    <p class="text-2xl font-bold text-gray-900">15%</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Standard commission rate</p>
+                                                </div>
+                                                <div class="p-4 border border-gray-200 rounded-lg">
+                                                    <p class="text-sm text-gray-600">Senior Agents</p>
+                                                    <p class="text-2xl font-bold text-gray-900">18%</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Increased commission rate</p>
+                                                </div>
+                                                <div class="p-4 border border-gray-200 rounded-lg">
+                                                    <p class="text-sm text-gray-600">Managers</p>
+                                                    <p class="text-2xl font-bold text-gray-900">20%</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Leadership commission rate</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="pt-6 border-t border-gray-200">
+                                            <h4 class="font-medium text-gray-900 mb-4">Policy Settings</h4>
+                                            <div class="space-y-4">
+                                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                                    <div>
+                                                        <h4 class="font-medium text-gray-900">Auto-Renew Policies</h4>
+                                                        <p class="text-sm text-gray-600">Automatically renew policies before expiry</p>
+                                                    </div>
+                                                    <label class="relative inline-flex items-center cursor-pointer">
+                                                        <input type="checkbox" class="sr-only peer" checked>
+                                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                                    </label>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                                    <div>
+                                                        <h4 class="font-medium text-gray-900">Policy Approval Required</h4>
+                                                        <p class="text-sm text-gray-600">Require manager approval for new policies</p>
+                                                    </div>
+                                                    <label class="relative inline-flex items-center cursor-pointer">
+                                                        <input type="checkbox" class="sr-only peer">
+                                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="pt-6 border-t border-gray-200">
+                                            <h4 class="font-medium text-gray-900 mb-4">Payment Settings</h4>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div class="p-4 border border-gray-200 rounded-lg">
+                                                    <p class="text-sm text-gray-600">Commission Payout</p>
+                                                    <select class="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                                        <option>Monthly</option>
+                                                        <option>Bi-weekly</option>
+                                                        <option>Weekly</option>
+                                                    </select>
+                                                </div>
+                                                <div class="p-4 border border-gray-200 rounded-lg">
+                                                    <p class="text-sm text-gray-600">Payment Method</p>
+                                                    <select class="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                                        <option>Direct Deposit</option>
+                                                        <option>Check</option>
+                                                        <option>Wire Transfer</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity Monitor Tab -->
+                            <div id="activityTab" class="tab-content">
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6">Activity Monitor</h3>
+                                    
+                                    <div class="mb-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h4 class="font-medium text-gray-900">Recent System Activity</h4>
+                                            <button class="px-4 py-2 btn-secondary rounded-lg">
+                                                <i class="fas fa-download mr-2"></i> Export Logs
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="space-y-4">
+                                            <div class="activity-log-item border-l-emerald-500">
+                                                <div class="flex justify-between">
+                                                    <h5 class="font-medium text-gray-900">User Login</h5>
+                                                    <span class="text-sm text-gray-500">Just now</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600">Admin User logged in from Chrome on Windows</p>
+                                                <p class="text-xs text-gray-500 mt-1">IP: 192.168.1.1 • Location: New York, USA</p>
+                                            </div>
+                                            
+                                            <div class="activity-log-item border-l-blue-500">
+                                                <div class="flex justify-between">
+                                                    <h5 class="font-medium text-gray-900">Policy Created</h5>
+                                                    <span class="text-sm text-gray-500">2 hours ago</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600">New auto insurance policy created for Robert Chen</p>
+                                                <p class="text-xs text-gray-500 mt-1">By: Keundta Smith • Policy ID: AUTO-2026-00124</p>
+                                            </div>
+                                            
+                                            <div class="activity-log-item border-l-purple-500">
+                                                <div class="flex justify-between">
+                                                    <h5 class="font-medium text-gray-900">Commission Paid</h5>
+                                                    <span class="text-sm text-gray-500">5 hours ago</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600">Commission payment processed for Q1 2026</p>
+                                                <p class="text-xs text-gray-500 mt-1">Amount: $42,580 • Recipients: 22 team members</p>
+                                            </div>
+                                            
+                                            <div class="activity-log-item border-l-amber-500">
+                                                <div class="flex justify-between">
+                                                    <h5 class="font-medium text-gray-900">Settings Updated</h5>
+                                                    <span class="text-sm text-gray-500">Yesterday</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600">Company information updated by Admin User</p>
+                                                <p class="text-xs text-gray-500 mt-1">Changed: Business hours and contact information</p>
+                                            </div>
+                                            
+                                            <div class="activity-log-item border-l-red-500">
+                                                <div class="flex justify-between">
+                                                    <h5 class="font-medium text-gray-900">Failed Login Attempt</h5>
+                                                    <span class="text-sm text-gray-500">2 days ago</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600">Failed login attempt from unknown IP address</p>
+                                                <p class="text-xs text-gray-500 mt-1">IP: 203.0.113.1 • Location: Unknown • Blocked</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="pt-6 border-t border-gray-200">
+                                        <h4 class="font-medium text-gray-900 mb-4">Activity Statistics</h4>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <div class="p-4 bg-emerald-50 rounded-lg">
+                                                <p class="text-sm text-gray-600">Today</p>
+                                                <p class="text-2xl font-bold text-gray-900">24</p>
+                                                <p class="text-xs text-gray-500">activities</p>
+                                            </div>
+                                            <div class="p-4 bg-blue-50 rounded-lg">
+                                                <p class="text-sm text-gray-600">This Week</p>
+                                                <p class="text-2xl font-bold text-gray-900">156</p>
+                                                <p class="text-xs text-gray-500">activities</p>
+                                            </div>
+                                            <div class="p-4 bg-purple-50 rounded-lg">
+                                                <p class="text-sm text-gray-600">This Month</p>
+                                                <p class="text-2xl font-bold text-gray-900">842</p>
+                                                <p class="text-xs text-gray-500">activities</p>
+                                            </div>
+                                            <div class="p-4 bg-amber-50 rounded-lg">
+                                                <p class="text-sm text-gray-600">Users Online</p>
+                                                <p class="text-2xl font-bold text-gray-900">8</p>
+                                                <p class="text-xs text-gray-500">active now</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dummy Content for Other Sidebar Sections -->
+                <div id="salesContent" class="settings-section">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6">Sales Dashboard</h2>
+                        <p class="text-gray-600 mb-8">Manage your sales pipeline, schedule, and leads</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="stat-card bg-white rounded-2xl p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 text-sm font-medium">Deals in Pipeline</p>
+                                        <p class="text-3xl font-bold text-gray-900 mt-2">24</p>
+                                        <div class="flex items-center mt-3">
+                                            <span class="text-emerald-500 text-sm font-medium flex items-center bg-emerald-50 px-2 py-1 rounded-full">
+                                                <i class="fas fa-arrow-up mr-1 text-xs"></i> 3 new today
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="icon-circle">
+                                        <i class="fas fa-project-diagram text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card bg-white rounded-2xl p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 text-sm font-medium">Today's Meetings</p>
+                                        <p class="text-3xl font-bold text-gray-900 mt-2">5</p>
+                                        <div class="flex items-center mt-3">
+                                            <span class="text-blue-500 text-sm font-medium flex items-center bg-blue-50 px-2 py-1 rounded-full">
+                                                <i class="fas fa-clock mr-1 text-xs"></i> Next in 1 hour
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="icon-circle bg-blue-50 text-blue-600 border-blue-100">
+                                        <i class="fas fa-calendar-check text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card bg-white rounded-2xl p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-500 text-sm font-medium">Active Leads</p>
+                                        <p class="text-3xl font-bold text-gray-900 mt-2">12</p>
+                                        <div class="flex items-center mt-3">
+                                            <span class="text-amber-500 text-sm font-medium flex items-center bg-amber-50 px-2 py-1 rounded-full">
+                                                <i class="fas fa-bullseye mr-1 text-xs"></i> 2 hot leads
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="icon-circle bg-amber-50 text-amber-600 border-amber-100">
+                                        <i class="fas fa-bullseye text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-8 rounded-2xl text-center">
+                            <i class="fas fa-chart-line text-4xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-bold text-gray-700 mb-2">Sales Content Area</h3>
+                            <p class="text-gray-600">This is where the sales-specific content would appear when you navigate to the Sales section.</p>
+                            <p class="text-gray-500 text-sm mt-4">In a full implementation, this would include detailed pipeline views, scheduling tools, and lead management features.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="clientsContent" class="settings-section">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6">Clients Management</h2>
+                        <p class="text-gray-600 mb-8">Manage all clients, policies, renewals, and commissions</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-emerald-50 p-6 rounded-2xl">
+                                <h3 class="text-lg font-bold text-gray-900 mb-4">Client Statistics</h3>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">Total Clients</span>
+                                        <span class="font-bold text-gray-900">892</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">Active Policies</span>
+                                        <span class="font-bold text-gray-900">1,247</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">Renewals Due</span>
+                                        <span class="font-bold text-red-600">47</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">Avg. Satisfaction</span>
+                                        <span class="font-bold text-emerald-600">94%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-6 rounded-2xl">
+                                <h3 class="text-lg font-bold text-gray-900 mb-4">Commission Overview</h3>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">This Month</span>
+                                        <span class="font-bold text-gray-900">$42,580</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">Last Month</span>
+                                        <span class="font-bold text-gray-900">$37,025</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">This Quarter</span>
+                                        <span class="font-bold text-gray-900">$124,750</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-700">Projected Annual</span>
+                                        <span class="font-bold text-emerald-600">$498,960</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 bg-gray-50 p-8 rounded-2xl text-center">
+                            <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-bold text-gray-700 mb-2">Clients Content Area</h3>
+                            <p class="text-gray-600">This is where the clients-specific content would appear when you navigate to the Clients section.</p>
+                            <p class="text-gray-500 text-sm mt-4">In a full implementation, this would include client lists, policy management tools, renewal tracking, and commission calculations.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="communicationContent" class="settings-section">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6">Communication Hub</h2>
+                        <p class="text-gray-600 mb-8">Manage messages and team communication</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-white border border-gray-200 p-6 rounded-2xl">
+                                <div class="flex items-center mb-4">
+                                    <div class="icon-circle mr-4">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">Messages</h3>
+                                        <p class="text-gray-600 text-sm">Client and team communications</p>
+                                    </div>
+                                    <span class="ml-auto bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">5 Unread</span>
+                                </div>
+                                <p class="text-gray-600">View and respond to messages from clients and team members.</p>
+                                <button class="mt-4 px-4 py-2 btn-primary rounded-lg w-full">
+                                    <i class="fas fa-inbox mr-2"></i> Open Messages
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white border border-gray-200 p-6 rounded-2xl">
+                                <div class="flex items-center mb-4">
+                                    <div class="icon-circle bg-blue-50 text-blue-600 border-blue-100 mr-4">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">Team Chat</h3>
+                                        <p class="text-gray-600 text-sm">Real-time team collaboration</p>
+                                    </div>
+                                    <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">3 Active</span>
+                                </div>
+                                <p class="text-gray-600">Collaborate with your team in real-time chat rooms.</p>
+                                <button class="mt-4 px-4 py-2 btn-secondary rounded-lg w-full">
+                                    <i class="fas fa-comments mr-2"></i> Open Team Chat
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-8 rounded-2xl text-center">
+                            <i class="fas fa-comments text-4xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-bold text-gray-700 mb-2">Communication Content Area</h3>
+                            <p class="text-gray-600">This is where the communication-specific content would appear when you navigate to the Communication section.</p>
+                            <p class="text-gray-500 text-sm mt-4">In a full implementation, this would include messaging interfaces, chat rooms, email integration, and communication analytics.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="resourcesContent" class="settings-section">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6">Resources Center</h2>
+                        <p class="text-gray-600 mb-8">Access documents, reports, and agency resources</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-white border border-gray-200 p-6 rounded-2xl">
+                                <div class="flex items-center mb-4">
+                                    <div class="icon-circle bg-amber-50 text-amber-600 border-amber-100 mr-4">
+                                        <i class="fas fa-folder-open"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">Documents</h3>
+                                        <p class="text-gray-600 text-sm">Policy templates, forms, and resources</p>
+                                    </div>
+                                    <span class="ml-auto bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">247 Files</span>
+                                </div>
+                                <p class="text-gray-600">Access all agency documents, templates, and forms.</p>
+                                <button class="mt-4 px-4 py-2 btn-primary rounded-lg w-full">
+                                    <i class="fas fa-folder-open mr-2"></i> Browse Documents
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white border border-gray-200 p-6 rounded-2xl">
+                                <div class="flex items-center mb-4">
+                                    <div class="icon-circle bg-purple-50 text-purple-600 border-purple-100 mr-4">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">Reports</h3>
+                                        <p class="text-gray-600 text-sm">Analytics and performance reports</p>
+                                    </div>
+                                    <span class="ml-auto bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-full">15 Reports</span>
+                                </div>
+                                <p class="text-gray-600">Generate and view agency performance reports.</p>
+                                <button class="mt-4 px-4 py-2 btn-secondary rounded-lg w-full">
+                                    <i class="fas fa-chart-bar mr-2"></i> View Reports
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-8 rounded-2xl text-center">
+                            <i class="fas fa-archive text-4xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-bold text-gray-700 mb-2">Resources Content Area</h3>
+                            <p class="text-gray-600">This is where the resources-specific content would appear when you navigate to the Resources section.</p>
+                            <p class="text-gray-500 text-sm mt-4">In a full implementation, this would include document management, report generation, knowledge base, and resource libraries.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <!-- Footer -->
+            <footer class="bg-white border-t border-gray-200 px-8 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <p class="text-gray-500 text-sm">© 2026 InsureSafe Agency. All rights reserved.</p>
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <button onclick="showPrivacyPolicy()" class="text-gray-500 hover:text-emerald-600 text-sm">Privacy Policy</button>
+                        <button onclick="showTermsOfService()" class="text-gray-500 hover:text-emerald-600 text-sm">Terms of Service</button>
+                        <button onclick="showHelpCenter()" class="text-gray-500 hover:text-emerald-600 text-sm">Help Center</button>
+                        <div class="text-sm text-gray-500 flex items-center">
+                            <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                            <span class="font-medium">All Systems Operational</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    
+    <script>
+        // State management
+        let activeNav = 'dashboard';
+        let activeSettingsTab = 'profile';
+        let teamMembers = [
+            { initials: 'KS', name: 'Keundta Smith', joinDate: 'Jan 8, 2026', role: 'Agent' },
+            { initials: 'DM', name: 'DM', joinDate: 'Jan 5, 2026', role: 'Agent' },
+            { initials: 'DF', name: 'DEFIN', joinDate: 'Jan 4, 2026', role: 'Agent' },
+            { initials: 'TT', name: 'Tac', joinDate: 'Dec 30, 2025', role: 'Agent' },
+            { initials: 'AC', name: 'Amand', joinDate: 'Dec 29, 2025', role: 'Agent' },
+            { initials: 'MJ', name: 'Michael Jordan', joinDate: 'Dec 15, 2025', role: 'Senior Agent' },
+            { initials: 'LR', name: 'Lisa Roberts', joinDate: 'Nov 28, 2025', role: 'Manager' },
+            { initials: 'TS', name: 'Taylor Swift', joinDate: 'Nov 10, 2025', role: 'Agent' },
+            { initials: 'JB', name: 'John Brown', joinDate: 'Oct 22, 2025', role: 'Agent' },
+            { initials: 'SM', name: 'Sarah Miller', joinDate: 'Oct 5, 2025', role: 'Agent' }
+        ];
+        
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        function openSidebar() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+        
+        mobileMenuToggle.addEventListener('click', openSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        
+        // Navigation functions
+        function setActiveNav(element, page) {
+            if (window.innerWidth < 768) {
+                closeSidebar();
+            }
+            
+            // Remove active class from all sidebar links
+            document.querySelectorAll('nav a').forEach(item => {
+                item.classList.remove('sidebar-active');
+            });
+            
+            // Add active class to clicked link
+            element.classList.add('sidebar-active');
+            activeNav = page;
+            
+            // Hide all content sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the appropriate content section
+            let contentId = '';
+            let pageTitle = '';
+            let pageDescription = '';
+            
+            switch(page) {
+                case 'dashboard':
+                    contentId = 'dashboardContent';
+                    pageTitle = 'Dashboard Overview';
+                    pageDescription = 'Welcome back, Admin. Here\'s your agency performance summary.';
+                    break;
+                case 'deals':
+                case 'schedule':
+                case 'leads':
+                    contentId = 'salesContent';
+                    pageTitle = 'Sales Dashboard';
+                    pageDescription = 'Manage your sales pipeline, schedule, and leads';
+                    break;
+                case 'clients':
+                case 'policies':
+                case 'commissions':
+                    contentId = 'clientsContent';
+                    pageTitle = 'Clients Management';
+                    pageDescription = 'Manage all clients, policies, renewals, and commissions';
+                    break;
+                case 'messages':
+                case 'chat':
+                    contentId = 'communicationContent';
+                    pageTitle = 'Communication Hub';
+                    pageDescription = 'Manage messages and team communication';
+                    break;
+                case 'documents':
+                case 'reports':
+                    contentId = 'resourcesContent';
+                    pageTitle = 'Resources Center';
+                    pageDescription = 'Access documents, reports, and agency resources';
+                    break;
+            }
+            
+            if (contentId) {
+                document.getElementById(contentId).classList.add('active');
+                document.getElementById('pageTitle').textContent = pageTitle;
+                document.getElementById('pageDescription').textContent = pageDescription;
+                showMessage(`Navigated to ${pageTitle}`, 'Navigation');
+            }
+        }
+        
+        // Settings functions
+        function openSettings() {
+            // Hide all content sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show settings content
+            document.getElementById('settingsContent').classList.add('active');
+            
+            // Update page title
+            document.getElementById('pageTitle').textContent = 'Settings';
+            document.getElementById('pageDescription').textContent = 'Manage your account and agency preferences';
+            
+            // Set settings nav as active in sidebar
+            document.querySelectorAll('nav a').forEach(item => {
+                item.classList.remove('sidebar-active');
+            });
+            
+            showMessage('Settings opened', 'Settings');
+        }
+        
+        function openSettingsTab(tabName) {
+            // Remove active class from all settings nav items
+            document.querySelectorAll('.settings-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            event.currentTarget.classList.add('active');
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            activeSettingsTab = tabName;
+            
+            showMessage(`Opened ${tabName} settings`, 'Settings');
+        }
+        
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // Message popup functions
+        function showMessage(message, title = 'Success!') {
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupMessage').textContent = message;
+            const popup = document.getElementById('messagePopup');
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                hidePopup();
+            }, 3000);
+        }
+        
+        function hidePopup() {
+            document.getElementById('messagePopup').classList.remove('show');
+        }
+        
+        // Button functionality (common functions)
+        function viewPolicies() {
+            showMessage('Viewing all policies...', 'Policies');
+        }
+        
+        function viewClients() {
+            showMessage('Viewing all clients...', 'Clients');
+        }
+        
+        function viewRenewals() {
+            showMessage('Viewing renewals due...', 'Renewals');
+        }
+        
+        function viewCommissions() {
+            showMessage('Viewing commissions...', 'Commissions');
+        }
+        
+        function sendMessage(memberName) {
+            showMessage(`Opening chat with ${memberName}...`, 'Message');
+        }
+        
+        function callMember(memberName) {
+            showMessage(`Calling ${memberName}...`, 'Call');
+        }
+        
+        function viewProfile(memberName) {
+            showMessage(`Viewing profile of ${memberName}...`, 'Profile');
+        }
+        
+        function viewAllMembers() {
+            showMessage('Loading all team members...', 'Team Members');
+        }
+        
+        function viewAllActivity() {
+            showMessage('Loading all activity...', 'Activity');
+        }
+        
+        function viewActivityDetails(activityId) {
+            showMessage(`Viewing details for activity: ${activityId}`, 'Activity Details');
+        }
+        
+        function changeMetricPeriod(selectElement) {
+            const period = selectElement.value;
+            showMessage(`Metrics updated for ${period}`, 'Metrics Updated');
+        }
+        
+        function viewNewPolicies() {
+            showMessage('Viewing new policies...', 'New Policies');
+        }
+        
+        function viewMeetings() {
+            showMessage('Viewing meetings...', 'Meetings');
+        }
+        
+        function showNotifications() {
+            showMessage('Showing notifications...', 'Notifications');
+        }
+        
+        function showMessages() {
+            showMessage('Showing messages...', 'Messages');
+        }
+        
+        function showNewOptions() {
+            showMessage('Showing new item options...', 'New');
+        }
+        
+        function showProfileMenu() {
+            showMessage('Opening profile menu...', 'Profile');
+        }
+        
+        function showPrivacyPolicy() {
+            showMessage('Opening privacy policy...', 'Privacy');
+        }
+        
+        function showTermsOfService() {
+            showMessage('Opening terms of service...', 'Terms');
+        }
+        
+        function showHelpCenter() {
+            showMessage('Opening help center...', 'Help');
+        }
+        
+        function applyFilter() {
+            closeModal('filterModal');
+            showMessage('Filter applied successfully!', 'Filter Applied');
+        }
+        
+        // Form submission
+        function addNewMember(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('memberName').value;
+            const email = document.getElementById('memberEmail').value;
+            const role = document.getElementById('memberRole').value;
+            const joinDate = document.getElementById('memberJoinDate').value;
+            
+            // Format date
+            const date = new Date(joinDate);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+            
+            // Add to team members array
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            teamMembers.unshift({
+                initials: initials,
+                name: name,
+                joinDate: formattedDate,
+                role: role
+            });
+            
+            closeModal('addMemberModal');
+            document.getElementById('addMemberForm').reset();
+            
+            showMessage(`${name} has been added to the team as a ${role}`, 'Member Added');
+        }
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value;
+                if (query.trim()) {
+                    showMessage(`Searching for: "${query}"`, 'Search');
+                }
+            }
+        });
+        
+        // Close sidebar on window resize if it's larger than mobile
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                closeSidebar();
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('memberJoinDate').value = today;
+            
+            // Set default active nav
+            setActiveNav(document.querySelector('nav a:first-child'), 'dashboard');
+            
+            // Set default active settings tab
+            openSettingsTab('profile');
+        });
+        
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+        
+        // Toggle switches functionality
+        document.querySelectorAll('input[type="checkbox"].sr-only').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    showMessage('Setting enabled', 'Settings');
+                } else {
+                    showMessage('Setting disabled', 'Settings');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
